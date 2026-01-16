@@ -69,6 +69,7 @@
       touch-action: none;
       margin-top: 12px;
       border-radius: 6px;
+      display: block;
     }
     .submit-group {
       margin-top: 16px;
@@ -110,7 +111,7 @@
     <div class="button-group" id="nrsScale"></div>
 
     <label>Schmerzbereich markieren</label>
-    <canvas id="painCanvas" width="400" height="800"></canvas>
+    <canvas id="painCanvas"></canvas>
 
     <div class="submit-group">
       <button class="submit-button" onclick="submitData()">Absenden</button>
@@ -126,16 +127,18 @@
     let selectedTimepoint = null;
     let selectedNrs = null;
 
-    // Bild laden
     img.onload = function () {
+      // Canvas-Größe an Bild anpassen (Hochformat)
+      canvas.width = img.width;
+      canvas.height = img.height;
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, 0, 0);
     };
-    img.src = "uex.jpeg"; // dein Körperschema
+    img.src = "koerperschema.jpeg.jpg";
 
     function resetCanvas() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, 0, 0);
     }
 
     // Zeichnen
@@ -154,7 +157,7 @@
       const y = (e.clientY - rect.top) * (canvas.height / rect.height);
       ctx.fillStyle = "rgba(255,0,0,0.4)";
       ctx.beginPath();
-      ctx.arc(x, y, 8, 0, Math.PI * 2); // flüssige Markierung
+      ctx.arc(x, y, 8, 0, Math.PI * 2); // flüssiger runder Punkt
       ctx.fill();
     }
 
@@ -167,7 +170,7 @@
       });
     });
 
-    // Schmerzskala
+    // Schmerzskala 0–10
     const nrsScale = document.getElementById("nrsScale");
     for (let i = 0; i <= 10; i++) {
       const btn = document.createElement("div");
@@ -213,3 +216,4 @@
   </script>
 </body>
 </html>
+
