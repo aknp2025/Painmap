@@ -3,248 +3,212 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Schmerzerfassung nach Arthroskopie</title>
+  <title>Schmerzerfassung</title>
   <style>
+    * {
+      box-sizing: border-box;
+    }
     body {
+      margin: 0;
       font-family: sans-serif;
-      padding: 20px;
-      background-color: #f5f5f5;
+      background-color: #f9f9f9;
+      padding: 16px;
     }
     .container {
-      max-width: 650px;
+      max-width: 500px;
       margin: auto;
-      background: white;
-      padding: 20px;
+      background: #fff;
+      padding: 16px;
       border-radius: 12px;
-      box-shadow: 0 0 12px rgba(0,0,0,0.1);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
-    canvas {
-      border: 1px solid #ccc;
-      touch-action: none;
-      margin-bottom: 10px;
-      width: 100%;
+    h1 {
+      font-size: 1.4rem;
+      text-align: center;
+    }
+    label {
+      display: block;
+      margin-top: 12px;
+      font-weight: bold;
     }
     input[type="text"] {
       width: 100%;
       padding: 8px;
-      margin-bottom: 12px;
+      margin-top: 4px;
       border: 1px solid #ccc;
-      border-radius: 8px;
+      border-radius: 6px;
+      font-size: 1rem;
     }
-    .timepoint-list {
+    .button-group {
       display: flex;
       flex-wrap: wrap;
       gap: 6px;
-      margin-bottom: 12px;
+      margin-top: 8px;
     }
-    .timepoint-button {
-      padding: 6px 10px;
+    .timepoint-button, .nrs-button {
+      flex: 1;
+      min-width: 60px;
+      padding: 10px;
       border: 1px solid #ccc;
       border-radius: 6px;
       background-color: #eee;
+      text-align: center;
       cursor: pointer;
+      user-select: none;
     }
-    .timepoint-button.active {
+    .timepoint-button.active,
+    .nrs-button.selected {
       background-color: #007bff;
       color: white;
       border-color: #0056b3;
     }
-    .timepoint-button.completed {
-      background-color: #28a745;
-      color: white;
-      border-color: #1e7e34;
+    canvas {
+      width: 100%;
+      height: auto;
+      border: 1px solid #ccc;
+      touch-action: none;
+      margin-top: 12px;
+      border-radius: 6px;
     }
-    .nrs-scale {
+    .submit-group {
+      margin-top: 16px;
       display: flex;
       justify-content: space-between;
-      margin-bottom: 16px;
-    }
-    .nrs-button {
-      padding: 10px;
-      width: 30px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      background-color: #eee;
-      cursor: pointer;
-      text-align: center;
-    }
-    .nrs-button.selected {
-      background-color: #dc3545;
-      color: white;
-      border-color: #b02a37;
-    }
-    .buttons {
-      display: flex;
-      gap: 10px;
-      margin-top: 10px;
     }
     button {
-      padding: 10px 20px;
+      padding: 10px 16px;
+      font-size: 1rem;
       border: none;
-      border-radius: 8px;
+      border-radius: 6px;
       cursor: pointer;
-      font-size: 16px;
     }
-    button.submit-button {
-      background-color: #007bff;
+    .submit-button {
+      background-color: #28a745;
       color: white;
     }
-    button.submit-button:hover {
-      background-color: #0056b3;
-    }
-    button.reset-button {
-      background-color: #6c757d;
+    .reset-button {
+      background-color: #dc3545;
       color: white;
-    }
-    button.reset-button:hover {
-      background-color: #5a6268;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h2>Schmerzerfassung nach Arthroskopie</h2>
+    <h1>Schmerzerfassung</h1>
 
-    <p>Bitte geben Sie Ihre Patienten-ID ein:</p>
+    <label for="patientId">Patienten-ID</label>
     <input type="text" id="patientId" placeholder="z.B. PAT-001" />
 
-    <p>Bitte wählen Sie den aktuellen Erhebungszeitpunkt:</p>
-    <div class="timepoint-list" id="timepoints">
-      <div class="timepoint-button" data-value="pre_1d">Vor OP: 1d</div>
-      <div class="timepoint-button" data-value="post_1h">+1h</div>
-      <div class="timepoint-button" data-value="post_3h">+3h</div>
-      <div class="timepoint-button" data-value="post_5h">+5h</div>
-      <div class="timepoint-button" data-value="post_12h">+12h</div>
-      <div class="timepoint-button" data-value="post_24h">+24h</div>
-      <div class="timepoint-button" data-value="post_3d">+3d</div>
-      <div class="timepoint-button" data-value="post_5d">+5d</div>
-      <div class="timepoint-button" data-value="post_7d">+7d</div>
-      <div class="timepoint-button" data-value="post_14d">+14d</div>
+    <label>Erhebungszeitpunkt</label>
+    <div class="button-group" id="timepoints">
+      <div class="timepoint-button" data-value="post_1d">+1 Tag</div>
+      <div class="timepoint-button" data-value="post_3d">+3 Tage</div>
+      <div class="timepoint-button" data-value="post_7d">+7 Tage</div>
     </div>
 
-    <p>Bitte wählen Sie die Schmerzstärke (0 = kein Schmerz, 10 = schlimmster Schmerz):</p>
-    <div class="nrs-scale" id="nrsScale"></div>
+    <label>Schmerzstärke (0–10)</label>
+    <div class="button-group" id="nrsScale"></div>
 
-    <p>Markieren Sie den Schmerzbereich auf der Abbildung:</p>
+    <label>Schmerzbereich markieren</label>
     <canvas id="painCanvas" width="400" height="800"></canvas>
 
-    <div class="buttons">
+    <div class="submit-group">
       <button class="submit-button" onclick="submitData()">Absenden</button>
       <button class="reset-button" onclick="resetCanvas()">Zurücksetzen</button>
     </div>
   </div>
 
   <script>
-    const canvas = document.getElementById('painCanvas');
-    const ctx = canvas.getContext('2d');
+    const canvas = document.getElementById("painCanvas");
+    const ctx = canvas.getContext("2d");
+    const img = new Image();
     let drawing = false;
     let selectedTimepoint = null;
     let selectedNrs = null;
-    let completedTimepoints = JSON.parse(localStorage.getItem('completedTimepoints') || '[]');
 
-    const img = new Image();
+    // Bild laden
     img.onload = function () {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
     };
-    img.src = 'koerperschema.jpeg.jpg'; // Bild im selben Ordner
+    img.src = "uex.jpeg"; // dein Körperschema
 
     function resetCanvas() {
-      drawing = false;
-      const newImg = new Image();
-      newImg.onload = function () {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.drawImage(newImg, 0, 0, canvas.width, canvas.height);
-      };
-      newImg.src = img.src;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
     }
 
-    canvas.addEventListener('pointerdown', startDraw);
-    canvas.addEventListener('pointermove', draw);
-    canvas.addEventListener('pointerup', stopDraw);
-    canvas.addEventListener('pointerleave', stopDraw);
-
-    function getCanvasCoordinates(e) {
-      const rect = canvas.getBoundingClientRect();
-      return {
-        x: (e.clientX - rect.left) * (canvas.width / rect.width),
-        y: (e.clientY - rect.top) * (canvas.height / rect.height)
-      };
-    }
-
-    function startDraw(e) {
+    // Zeichnen
+    canvas.addEventListener("pointerdown", (e) => {
       drawing = true;
-      draw(e); // sofort zeichnen bei Kontakt
-    }
-
-    function stopDraw() {
-      drawing = false;
-    }
+      draw(e);
+    });
+    canvas.addEventListener("pointermove", draw);
+    canvas.addEventListener("pointerup", () => drawing = false);
+    canvas.addEventListener("pointerleave", () => drawing = false);
 
     function draw(e) {
       if (!drawing) return;
-      const { x, y } = getCanvasCoordinates(e);
-      ctx.fillStyle = 'rgba(255,0,0,0.4)';
+      const rect = canvas.getBoundingClientRect();
+      const x = (e.clientX - rect.left) * (canvas.width / rect.width);
+      const y = (e.clientY - rect.top) * (canvas.height / rect.height);
+      ctx.fillStyle = "rgba(255,0,0,0.4)";
       ctx.beginPath();
-      ctx.arc(x, y, 7, 0, Math.PI * 2); // größerer Radius für bessere Sichtbarkeit
+      ctx.arc(x, y, 8, 0, Math.PI * 2); // flüssige Markierung
       ctx.fill();
     }
 
-    const timepointButtons = document.querySelectorAll('.timepoint-button');
-    timepointButtons.forEach(btn => {
-      if (completedTimepoints.includes(btn.dataset.value)) {
-        btn.classList.add('completed');
-      }
-      btn.addEventListener('click', () => {
-        timepointButtons.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
+    // Zeitpunkte
+    document.querySelectorAll(".timepoint-button").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".timepoint-button").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
         selectedTimepoint = btn.dataset.value;
       });
     });
 
-    const nrsScale = document.getElementById('nrsScale');
+    // Schmerzskala
+    const nrsScale = document.getElementById("nrsScale");
     for (let i = 0; i <= 10; i++) {
-      const btn = document.createElement('div');
+      const btn = document.createElement("div");
+      btn.classList.add("nrs-button");
       btn.textContent = i;
-      btn.classList.add('nrs-button');
-      btn.addEventListener('click', () => {
+      btn.addEventListener("click", () => {
         selectedNrs = i;
-        document.querySelectorAll('.nrs-button').forEach(b => b.classList.remove('selected'));
-        btn.classList.add('selected');
+        document.querySelectorAll(".nrs-button").forEach(b => b.classList.remove("selected"));
+        btn.classList.add("selected");
       });
       nrsScale.appendChild(btn);
     }
 
     function submitData() {
-      const patientId = document.getElementById('patientId').value.trim();
-      if (!patientId) return alert('Bitte geben Sie eine Patienten-ID ein.');
-      if (!selectedTimepoint) return alert('Bitte wählen Sie einen Erhebungszeitpunkt.');
-      if (selectedNrs === null) return alert('Bitte wählen Sie die Schmerzstärke.');
+      const patientId = document.getElementById("patientId").value.trim();
+      if (!patientId) return alert("Bitte Patienten-ID eingeben.");
+      if (!selectedTimepoint) return alert("Bitte Erhebungszeitpunkt wählen.");
+      if (selectedNrs === null) return alert("Bitte Schmerzstärke wählen.");
 
       const dataUrl = canvas.toDataURL();
-      const timestamp = new Date().toISOString();
-
       const payload = {
         patientId: patientId,
-        timestamp: timestamp,
         timepoint: selectedTimepoint,
+        nrs: selectedNrs,
         imageData: dataUrl,
-        nrs: selectedNrs
+        timestamp: new Date().toISOString()
       };
 
-      fetch('http://localhost:5000/upload', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      fetch("https://DEIN-RENDER-SERVER.onrender.com/upload", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
       })
-      .then(response => response.text())
-      .then(result => {
-        alert(result);
-        completedTimepoints.push(selectedTimepoint);
-        localStorage.setItem('completedTimepoints', JSON.stringify(completedTimepoints));
-        document.querySelector(`.timepoint-button[data-value="${selectedTimepoint}"]`).classList.add('completed');
+      .then(res => res.text())
+      .then(msg => {
+        alert("Daten erfolgreich gesendet.");
+        resetCanvas();
       })
-      .catch(error => alert('Fehler beim Senden der Daten: ' + error));
+      .catch(err => {
+        alert("Fehler beim Senden: " + err.message);
+      });
     }
   </script>
 </body>
