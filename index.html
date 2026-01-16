@@ -115,7 +115,7 @@
     <label>Schmerzstärke (0–10)</label>
     <div class="button-group" id="nrsScale"></div>
 
-    <label>Schmerzbereich markieren (nur mit Stift oder Maus)</label>
+    <label>Schmerzbereich markieren (zeichnen mit Finger, Stift oder Maus)</label>
     <div class="canvas-wrapper">
       <canvas id="painCanvas"></canvas>
     </div>
@@ -140,7 +140,7 @@
       canvas.height = img.height;
       ctx.drawImage(img, 0, 0);
     };
-    img.src = "koerperschema.jpeg.jpg"; // <-- dein Bildname
+    img.src = "koerperschema.jpeg.jpg"; // <- Bild im gleichen Ordner
 
     function resetCanvas() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -148,7 +148,8 @@
     }
 
     canvas.addEventListener("pointerdown", (e) => {
-      if (e.pointerType !== "pen" && e.pointerType !== "mouse") return;
+      // nur Hauptfinger (isPrimary) erlaubt zeichnen
+      if (e.pointerType === "touch" && !e.isPrimary) return;
       drawing = true;
       const { x, y } = getPosition(e);
       lastX = x;
@@ -156,7 +157,7 @@
     });
 
     canvas.addEventListener("pointermove", (e) => {
-      if (!drawing || (e.pointerType !== "pen" && e.pointerType !== "mouse")) return;
+      if (!drawing || (e.pointerType === "touch" && !e.isPrimary)) return;
       const { x, y } = getPosition(e);
       ctx.strokeStyle = "rgba(255, 0, 0, 0.8)";
       ctx.lineWidth = 1;
@@ -233,6 +234,8 @@
   </script>
 </body>
 </html>
+
+
 
 
 
