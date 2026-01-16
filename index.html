@@ -60,12 +60,11 @@
       border-color: #0056b3;
     }
 
-    /* Zoom-Container */
     .canvas-wrapper {
       overflow: auto;
       border: 1px solid #ccc;
       border-radius: 8px;
-      touch-action: auto; /* erlaubt Pinch/Zoom */
+      touch-action: auto;
       margin-top: 12px;
       max-height: 90vh;
     }
@@ -74,7 +73,7 @@
       display: block;
       width: 100%;
       height: auto;
-      touch-action: none; /* verhindert versehentliche Scrolls beim Zeichnen */
+      touch-action: none;
     }
 
     .submit-group {
@@ -116,7 +115,7 @@
     <label>Schmerzstärke (0–10)</label>
     <div class="button-group" id="nrsScale"></div>
 
-    <label>Schmerzbereich markieren (zeichnen mit Stift oder einem Finger)</label>
+    <label>Schmerzbereich markieren (nur mit Stift oder Maus)</label>
     <div class="canvas-wrapper">
       <canvas id="painCanvas"></canvas>
     </div>
@@ -141,14 +140,13 @@
       canvas.height = img.height;
       ctx.drawImage(img, 0, 0);
     };
-    img.src = "koerperschema.jpeg.jpg";
+    img.src = "koerperschema.jpeg.jpg"; // <-- dein Bildname
 
     function resetCanvas() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.drawImage(img, 0, 0);
     }
 
-    // Zeichnen nur mit Stift oder Maus (nicht bei Touch)
     canvas.addEventListener("pointerdown", (e) => {
       if (e.pointerType !== "pen" && e.pointerType !== "mouse") return;
       drawing = true;
@@ -182,7 +180,6 @@
       };
     }
 
-    // Zeitpunkte
     document.querySelectorAll(".timepoint-button").forEach(btn => {
       btn.addEventListener("click", () => {
         document.querySelectorAll(".timepoint-button").forEach(b => b.classList.remove("active"));
@@ -191,7 +188,6 @@
       });
     });
 
-    // Schmerzskala 0–10
     const nrsScale = document.getElementById("nrsScale");
     for (let i = 0; i <= 10; i++) {
       const btn = document.createElement("div");
@@ -237,5 +233,6 @@
   </script>
 </body>
 </html>
+
 
 
